@@ -1,0 +1,18 @@
+# Enforce LF for all text files
+* text=auto eol=lf
+
+# Ensure binary files are not converted
+*.jpg binary
+*.png binary
+*.gif binary
+*.webp binary
+
+# Node.js/React specific files to use LF
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.html text eol=l
