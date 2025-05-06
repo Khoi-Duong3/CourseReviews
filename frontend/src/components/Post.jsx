@@ -1,5 +1,6 @@
 import React from 'react'
 import { useState } from 'react'
+import { NavLink } from 'react-router-dom';
 
 const Post = ({coop}) => {
     const [showAll, setShowAll] = useState(false);
@@ -28,12 +29,12 @@ const Post = ({coop}) => {
 
               <div class="flex flex-col lg:flex-row justify-between mb-4">
                 <div class="mb-3"></div>
-                <a
-                  href="jobs.html"
-                  class="h-[36px] bg-red-900 hover:bg-red-950 text-yellow-500 font-bold px-4 py-2 rounded-lg text-center text-sm"
+                <NavLink
+                  to='courseinfo'
+                  className="h-[36px] bg-red-900 hover:bg-red-950 text-yellow-500 font-bold px-4 py-2 rounded-lg text-center text-sm"
                 >
-                 More Details
-                </a>
+                  More Details
+                </NavLink>
               </div>
             </div>
           </div>
