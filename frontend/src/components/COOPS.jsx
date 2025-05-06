@@ -3,7 +3,7 @@ import coops from '../coops.json'
 import Post from './Post';
 
 const COOPS = ({isHome = false}) => {
-  const coopPosts = isHome? coops.slice(0,3) : coops;
+  const coopPosts = isHome? coops.slice(0,6) : coops;
 
   return (
     <section class="bg-red-950 px-4 py-10">

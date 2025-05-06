@@ -1,9 +1,9 @@
   [
     {
       "id": "1",
-      "title": "Senior React Developer",
-      "type": "Full-Time",
-      "description": "We are seeking a talented Front-End Developer to join our team in Boston, MA. The ideal candidate will have strong skills in HTML, CSS, and JavaScript, with experience working with modern JavaScript frameworks such as React or Angular.",
+      "title": "Introductory Microeconomics",
+      "type": "ECON 1B03",
+      "description": "An introduction to the method and theory of microeconomics, and their application to the analysis of contemporary economic problems.",
       "location": "Boston, MA",
       "salary": "$70K - $80K",
       "company": {
@@ -15,10 +15,10 @@
     },
     {
       "id": "2",
-      "title": "Front-End Engineer (React & Redux)",
-      "type": "Full-Time",
+      "title": "Applications of Linear Algebra",
+      "type": "MATH 2LA3",
       "location": "Miami, FL",
-      "description": "Join our team as a Front-End Developer in sunny Miami, FL. We are looking for a motivated individual with a passion for crafting beautiful and responsive web applications. Experience with UI/UX design principles and a strong attention to detail are highly desirable.",
+      "description": "This course focuses on applications of linear algebra. Topics include linear programming, applications of matrix decomposition theorems, examples from data science, singular value decomposition and applications to compression.",
       "salary": "$70K - $80K",
       "company": {
         "name": "Veneer Solutions",
@@ -29,10 +29,10 @@
     },
     {
       "id": "3",
-      "title": "React.js Dev",
-      "type": "Full-Time",
+      "title": "Computer Architecture",
+      "type": "COMPSCI 2GA3",
       "location": "Brooklyn, NY",
-      "description": "Are you passionate about front-end development? Join our team in vibrant Brooklyn, NY, and work on exciting projects that make a difference. We offer competitive compensation and a collaborative work environment where your ideas are valued.",
+      "description": "Introduction to logic gates, computer arithmetic, instruction-set architecture, assembly programming, translation of high-level languages into assembly. Computer system organization: datapath and control, pipelining, memory hierarchies, I/O systems; measures of performance.",
       "salary": "$70K - $80K",
       "company": {
         "name": "Dolor Cloud",
@@ -43,9 +43,9 @@
     },
     {
       "id": "4",
-      "title": "React Front-End Developer",
-      "type": "Part-Time",
-      "description": "Join our team as a Part-Time Front-End Developer in beautiful Pheonix, AZ. We are looking for a self-motivated individual with a passion for creating engaging user experiences. This position offers flexible hours and the opportunity to work remotely.",
+      "title": "Introduction to Programming",
+      "type": "COMPSCI 1MD3",
+      "description": "Introduction to fundamental programming concepts: values and types, expressions and evaluation, control flow constructs and exceptions, recursion, input/output and file processing.",
       "location": "Pheonix, AZ",
       "salary": "$60K - $70K",
       "company": {
@@ -57,9 +57,9 @@
     },
     {
       "id": "5",
-      "title": "Full Stack React Developer",
-      "type": "Full-Time",
-      "description": "Exciting opportunity for a Full-Time Front-End Developer in bustling Atlanta, GA. We are seeking a talented individual with a passion for building elegant and scalable web applications. Join our team and make an impact!",
+      "title": "Databases",
+      "type": "COMPSCI 2DB3",
+      "description": "Data modelling, integrity constraints, principles and design of relational databases, relational algebra, SQL, query processing, transactions, concurrency control, recovery, security and data storage.",
       "location": "Atlanta, GA",
       "salary": "$90K - $100K",
       "company": {
@@ -71,9 +71,9 @@
     },
     {
       "id": "6",
-      "title": "React Native Developer",
-      "type": "Full-Time",
-      "description": "Join our team as a Front-End Developer in beautiful Portland, OR. We are looking for a skilled and enthusiastic individual to help us create innovative web solutions. Competitive salary and great benefits package available.",
+      "title": "Linear Algebra I",
+      "type": "MATH 1B03",
+      "description": "Vector spaces given by solutions to linear systems. Linear independence, dimension. Determinants. Eigenvalues, eigenvectors and diagonalisation. Complex numbers.",
       "location": "Portland, OR",
       "salary": "$100K - $110K",
       "company": {
