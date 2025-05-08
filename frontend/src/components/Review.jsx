@@ -1,8 +1,5 @@
 import React from 'react'
 
-/**
- * Returns a Tailwind background color class based on a numeric score 1-5
- */
 const getScoreColor = (score) => {
   switch (score) {
     case 1:
@@ -16,7 +13,7 @@ const getScoreColor = (score) => {
     case 5:
       return 'bg-green-500'
     default:
-      return 'bg-gray-300' // fallback if somehow out of range
+      return 'bg-gray-300'
   }
 }
 
@@ -36,12 +33,6 @@ const getDiffColor = (score) => {
       return 'bg-gray-300'
   }
 }
-
-/**
- * Displays a single review:
- *  - text: main body of the review
- *  - difficulty, value, overall: numeric scores (1-5)
- */
 const Review = ({
   text = "this course is hard as hell",
   difficulty = 5,

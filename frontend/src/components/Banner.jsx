@@ -1,13 +1,17 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
+import { NavLink } from 'react-router-dom'
 import bgimage from '../assets/images/macbanner.jpg'
 
 const Banner = ({ subtitle = 'Find Your Course' }) => {
   const [courseCode, setCourseCode] = useState('')
+  const encodedCode = encodeURIComponent(courseCode.trim().toUpperCase())
+  const linkRef = useRef(null)
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    // Handle the form submission (e.g., API call or something else)
-    console.log('Course code submitted:', courseCode)
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      linkRef.current?.click()
+    }
   }
 
   return (
@@ -24,24 +28,26 @@ const Banner = ({ subtitle = 'Find Your Course' }) => {
           <p className="my-4 text-2xl font-extrabold text-yellow-500 sm:text-5xl md:text-6xl">
             {subtitle}
           </p>
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="mt-4 max-w-md mx-auto w-full">
+          {/* Search Input + NavLink */}
+          <div className="mt-4 max-w-md mx-auto w-full text-center">
             <input
               type="text"
               id="courseCode"
               name="courseCode"
-              className="border rounded w-full py-2 px-3 mb-2"
+              className="border rounded w-full py-2 px-3 mb-4"
               placeholder="e.g. MATH 2LA3"
               value={courseCode}
               onChange={(e) => setCourseCode(e.target.value)}
+              onKeyDown={handleKeyDown}
             />
-            <button
-              type="submit"
-              className="bg-yellow-500 text-black py-2 px-4 rounded hover:bg-yellow-600"
+            <NavLink
+              ref={linkRef}
+              to={`/courseinfo/${encodedCode}`}
+              className="bg-yellow-500 text-black py-2 px-4 rounded hover:bg-yellow-600 inline-block"
             >
               Submit
-            </button>
-          </form>
+            </NavLink>
+          </div>
         </div>
       </div>
     </section>
