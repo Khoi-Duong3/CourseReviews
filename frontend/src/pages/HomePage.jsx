@@ -1,13 +1,12 @@
 import React from 'react'
 import Banner from '../components/Banner'
-import COOPS from '../components/COOPS';
-import BrowseMore from '../components/BrowseMore';
+import HomeCourses from '../components/HomeCourses';
 
 const HomePage = () => {
   return (
     <>
         <Banner />
-        <COOPS isHome={true}/>
+        <HomeCourses isHome={true}/>
     </>
   )
 }

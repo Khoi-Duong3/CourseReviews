@@ -12,20 +12,17 @@ export default function CourseDetailCard({ code, name, description, prereq, anti
 
       {/* White info card */}
       <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-lg p-6 text-black">
-        <h1 className="text-2xl font-bold mb-2">
+        <h1 className="text-2xl font-semibold mb-2">
           {code} — {name}
         </h1>
-        <p className="mb-4">{description}</p>
-        {prereq && (
-          <p className="text-sm mb-2">
-            <strong>Prerequisites:</strong> {prereq}
-          </p>
-        )}
-        {antireq && (
-          <p className="text-sm">
-            <strong>Antirequisites:</strong> {antireq}
-          </p>
-        )}
+        <p className="text-sm mb-4">{description}</p>
+        
+        <p className="text-sm mb-2">
+          <strong>Prerequisites: </strong> {prereq ? prereq : 'None'}
+        </p>
+        <p className="text-sm">
+          <strong>Antirequisites: </strong> {antireq ? antireq : 'None'}
+        </p>
       </div>
     </section>
   )

@@ -1,17 +1,27 @@
-import React from 'react'
-import COOPS from '../components/COOPS'
-import UpdateInfo from '../components/UpdateInfo'
+// src/pages/Dashboard.jsx
+import React, { useState, useEffect } from 'react'
+import HomeCourses from '../components/HomeCourses'
 
-const Dashboard = () => {
+export default function Dashboard() {
+  const [limit, setLimit] = useState(9)
+
+  useEffect(() => {
+    const onScroll = () => {
+      
+      if (
+        window.innerHeight + window.scrollY >=
+        document.documentElement.scrollHeight - 175
+      ) {
+        setLimit(l => l + 6)
+      }
+    }
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   return (
-    <>
-      <section className='bg-zinc-900 px-4 py-6'>
-        <UpdateInfo />
-        <COOPS />
-      </section>
-    </>
-    
+    <div className="py-4">
+      <HomeCourses isHome={false} limit={limit} />
+    </div>
   )
 }
-
-export default Dashboard
