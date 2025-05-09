@@ -1,44 +1,46 @@
-import React from 'react'
-import { useState } from 'react'
-import { NavLink } from 'react-router-dom';
+import React, { useState } from 'react'
+import { NavLink } from 'react-router-dom'
 
-const Post = ({coop}) => {
-    const [showAll, setShowAll] = useState(false);
+export default function Post({ course }) {
+  const { code, name, description } = course
+  const [expanded, setExpanded] = useState(false)
 
-    let description = coop.description;
-
-    if (!showAll) {
-        description = description.substring(0,80) + '...';
-    }
+  // Determine text to display
+  const preview = description.length > 150
+    ? description.slice(0, 150) + '...'
+    : description
+  const displayText = expanded ? description : preview
 
   return (
-    <div class="bg-white rounded-xl shadow-md relative">
-            <div className="p-4">
-              <div class="mb-6">
-                <div className="text-black my-2">{coop.type}</div>
-                <h3 class="text-black text-xl font-bold">{coop.title}</h3>
-              </div>
+    <article className="bg-white rounded-md shadow-md p-6 border border-gray-200 flex flex-col h-full">
+      {/* Header: course code and name */}
+      <header>
+        <p className="text-sm text-gray-700 uppercase tracking-wide mb-1">{code}</p>
+        <h3 className="text-xl font-semibold mb-2">{name}</h3>
+      </header>
 
-              <div className=" text-black mb-5">
-               {description}
-              </div>
+      {/* Body: description with expand/collapse */}
+      <div className="flex-grow">
+        <p className="text-sm text-gray-700 mb-2">{displayText}</p>
+        {description.length > 150 && (
+          <button
+            onClick={() => setExpanded(prev => !prev)}
+            className="text-red-800 text-sm font-medium focus:outline-none"
+          >
+            {expanded ? 'Show Less' : 'Show More'}
+          </button>
+        )}
+      </div>
 
-              <button onClick={() => setShowAll((prevState) => !prevState)}className='text-red-950 mb-5 hover:text-amber-700'>{ showAll ? 'Show Less' : 'Show More'}</button>
-
-              <div class="border border-gray-100 mb-5"></div>
-
-              <div class="flex flex-col lg:flex-row justify-between mb-4">
-                <div class="mb-3"></div>
-                <NavLink
-                  to='courseinfo'
-                  className="h-[36px] bg-red-900 hover:bg-red-950 text-yellow-500 font-bold px-4 py-2 rounded-lg text-center text-sm"
-                >
-                  More Details
-                </NavLink>
-              </div>
-            </div>
-          </div>
+      {/* Footer: divider and button aligned to bottom */}
+      <footer className="mt-4 pt-4 border-t border-gray-200 flex justify-end">
+        <NavLink
+          to={`/courseinfo/${encodeURIComponent(code)}`}
+          className="bg-red-900 text-yellow-500 font-medium py-1 px-3 rounded hover:bg-red-950"
+        >
+          More Details
+        </NavLink>
+      </footer>
+    </article>
   )
 }
-
-export default Post
