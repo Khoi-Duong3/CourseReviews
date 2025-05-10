@@ -55,10 +55,12 @@ export default function NavBarEverywhere() {
                 <NavLink to='/' className="text-white hover:bg-red-900 rounded-md px-3 py-2">
                   Home
                 </NavLink>
-
-                <NavLink to='/test' className="text-white hover:bg-red-900 rounded-md px-3 py-2">
-                  Test
-                </NavLink>
+                {isAuthenticated && (
+                  <NavLink to='/test' className="text-white hover:bg-red-900 rounded-md px-3 py-2">
+                    Test
+                  </NavLink>
+                )}
+                
 
                 {!isAuthenticated ? (
                   <button onClick={() => loginWithRedirect()} className="text-white hover:bg-red-900 rounded-md px-3 py-2">
