@@ -8,6 +8,8 @@ import { Auth0Provider } from '@auth0/auth0-react';
 import Review from './components/Review';
 import CourseInfo from './pages/CourseInfo';
 import EverywhereElseLayout from './layouts/EverywhereElseLayout';
+import ProfilePage from './pages/ProfilePage';
+import UpdateInfo from './pages/UpdateInfo'
 
 const domain = import.meta.env.VITE_APP_AUTH0_DOMAIN;
 const clientID = import.meta.env.VITE_APP_AUTH0_CLIENT_ID;
@@ -24,8 +26,9 @@ const router = createBrowserRouter(
       <Route path='courseinfo' element={<CourseInfo/>}/>
       <Route path='courseinfo/:code' element={<CourseInfo/>} />
       <Route path='login' element={<LoginPage />} />
-      <Route path='test' element={<Review />} />
+      <Route path='test' element={<ProfilePage />} />
       <Route path='dashboard' element={<Dashboard />} />
+      <Route path='updateinfo' element={<UpdateInfo />} />
     </Route>
   </>
   )
