@@ -2,6 +2,8 @@ from flask import Blueprint, request, jsonify
 from application.database import mongo
 import json
 import os
+import datetime
+import uuid
 
 main = Blueprint("main", __name__, url_prefix='/api')
 
@@ -86,3 +88,87 @@ def get_profile(email):
     if not profile:
         return jsonify({}), 200
     return jsonify(profile), 200
+
+
+
+
+
+
+# Path to the reviews JSON file
+REVIEWS_PATH = os.path.abspath(
+    os.path.join(
+    os.path.dirname(__file__),
+    '..',
+    'reviews.json'
+    )
+)
+
+@main.route("/json-reviews/<department>/<course_code>", methods=["GET"])
+def get_json_reviews(department, course_code):
+    """Retrieve all reviews for a specific course from JSON file."""
+    try:
+        with open(REVIEWS_PATH, 'r', encoding='utf-8') as f:
+            reviews_data = json.load(f)
+
+        if department in reviews_data and course_code in reviews_data[department]:
+            return jsonify(reviews_data[department][course_code]), 200
+        else:
+            return jsonify([]), 200
+    except FileNotFoundError:
+        # If file doesn't exist yet, return empty array
+        return jsonify([]), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@main.route("/json-reviews", methods=["POST"])
+def add_json_review():
+    """Add a new review to the JSON file."""
+    data = request.get_json()
+    department = data.get("department")
+    course_code = data.get("code")
+    review = data.get("review")
+
+    if not department or not course_code or not review:
+        return jsonify({"error": "Missing required fields"}), 400
+
+    try:
+        # Create reviews.json if it doesn't exist
+        if not os.path.exists(REVIEWS_PATH):
+            with open(REVIEWS_PATH, 'w', encoding='utf-8') as f:
+                json.dump({}, f)
+
+        # Read existing reviews
+        with open(REVIEWS_PATH, 'r', encoding='utf-8') as f:
+            reviews_data = json.load(f)
+
+        # Create department and course entries if they don't exist
+        if department not in reviews_data:
+            reviews_data[department] = {}
+
+        if course_code not in reviews_data[department]:
+            reviews_data[department][course_code] = []
+
+        # Add ID and timestamp to review
+        review_with_meta = {
+            **review,
+            "id": str(uuid.uuid4()),
+            "timestamp": datetime.datetime.now().isoformat()
+        }
+
+        # Add the review
+        reviews_data[department][course_code].append(review_with_meta)
+
+        # Write updated data back to file
+        with open(REVIEWS_PATH, 'w', encoding='utf-8') as f:
+            json.dump(reviews_data, f, indent=2)
+
+        # Also save to MongoDB for consistency
+        mongo.db.reviews.insert_one({
+            "course_code": course_code,
+            **review_with_meta
+        })
+
+        return jsonify({"message": "Review added successfully!", "review": review_with_meta}), 201
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
