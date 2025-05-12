@@ -1,0 +1,98 @@
+{
+  "GERMAN": {
+    "GERMAN 1B03": {
+      "reviews": [
+        {
+          "id": 1,
+          "text": "This course was challenging but rewarding. The professor was excellent at explaining complex grammar concepts.",
+          "difficulty": 4,
+          "value": 5,
+          "overall": 4,
+          "timestamp": "2024-03-15T14:30:00Z"
+        },
+        {
+          "id": 2,
+          "text": "Great introduction to intermediate German. The workload was manageable and the content was engaging.",
+          "difficulty": 3,
+          "value": 4,
+          "overall": 4,
+          "timestamp": "2023-12-10T09:15:00Z"
+        }
+      ]
+    },
+    "GERMAN 2CC3": {
+      "reviews": [
+        {
+          "id": 3,
+          "text": "Fascinating course on German culture. The readings were extensive but worth it.",
+          "difficulty": 4,
+          "value": 5,
+          "overall": 5,
+          "timestamp": "2024-04-22T16:45:00Z"
+        }
+      ]
+    }
+  },
+  "HISTORY": {
+    "HISTORY 1DD3": {
+      "reviews": [
+        {
+          "id": 4,
+          "text": "The professor was excellent, but the workload was heavy. Lots of reading every week.",
+          "difficulty": 5,
+          "value": 4,
+          "overall": 4,
+          "timestamp": "2024-01-18T11:20:00Z"
+        },
+        {
+          "id": 5,
+          "text": "I wouldn't recommend this course unless you're really interested in the subject. The lectures were sometimes dry.",
+          "difficulty": 5,
+          "value": 2,
+          "overall": 3,
+          "timestamp": "2023-11-30T13:40:00Z"
+        }
+      ]
+    },
+    "HISTORY 2A03": {
+      "reviews": [
+        {
+          "id": 6,
+          "text": "One of the best courses I've taken at McMaster. The content was engaging and the professor was passionate about the subject.",
+          "difficulty": 3,
+          "value": 5,
+          "overall": 5,
+          "timestamp": "2024-02-05T10:30:00Z"
+        }
+      ]
+    }
+  },`
+  "MUSIC": {
+    "MUSIC 1A03": {
+      "reviews": [
+        {
+          "id": 7,
+          "text": "Great introduction to Western music history. No prior music knowledge needed to do well.",
+          "difficulty": 2,
+          "value": 4,
+          "overall": 4,
+          "timestamp": "2024-03-02T15:15:00Z"
+        }
+      ]
+    }
+  },
+  "THTRFLM": {
+    "THTRFLM 2FA3": {
+      "reviews": [
+        {
+          "id": 8,
+          "text": "Interesting course on film analysis. Weekly film screenings were enjoyable but the papers were challenging.",
+          "difficulty": 4,
+          "value": 4,
+          "overall": 4,
+          "timestamp": "2023-12-12T14:25:00Z"
+        }
+      ]
+    }
+  }
+}
