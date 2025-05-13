@@ -16,11 +16,40 @@ DATA_PATH = os.path.abspath(
     )
 )
 
+with open(DATA_PATH, encoding="utf-8") as f:
+    ALL_COURSES = json.load(f)
+
 @main.route("/reviews/<course_code>", methods=["GET"])
 def get_course_reviews(course_code):
-    """Retrieve all reviews for a specific course."""
-    creviews = list(mongo.db.reviews.find({"course_code": course_code}))
-    return jsonify(creviews), 200
+    code_key = course_code.strip().upper()
+    dept = code_key.split()[0]
+
+    # 1) Try the static reviews.json first
+    try:
+        with open(REVIEWS_PATH, "r", encoding="utf-8") as f:
+            all_reviews = json.load(f)
+        if dept in all_reviews and code_key in all_reviews[dept]:
+            return jsonify(all_reviews[dept][code_key]), 200
+    except FileNotFoundError:
+        # no reviews.json yet, keep going
+        pass
+    except Exception as e:
+        # JSON parse error? log it and keep going
+        print("Error loading reviews.json:", e)
+
+    # 2) Fall back to Mongo
+    try:
+        db_reviews = list(
+            mongo.db.reviews
+               .find({"course_code": code_key}, {"_id": 0})
+        )
+        return jsonify(db_reviews), 200
+    except Exception:
+        # Mongo not set up / auth failed — just move on
+        pass
+
+    # 3) Nothing found → return empty array
+    return jsonify([]), 200
 
 @main.route("/reviews", methods=["POST"])
 def add_review():
@@ -42,26 +71,21 @@ def list_courses():
 
 @main.route("/courses/<code>", methods=["GET"])
 def get_course(code):
-    """Get detailed info for a single course by code."""
-    code_key = code.upper()
-    # First, attempt to fetch from MongoDB (if configured)
+    code_key = code.strip().upper()
+
+    for block in ALL_COURSES.values():
+        if code_key in block:
+            info = block[code_key]
+            return jsonify({ "code": code_key, **info}), 200
+    
     try:
         course = mongo.db.courses.find_one({"code": code_key}, {"_id": 0})
         if course:
             return jsonify(course), 200
     except Exception:
-        # Fallback to JSON if MongoDB not ready or not configured
         pass
 
-    # Fallback: search in the JSON dataset
-    with open(DATA_PATH, 'r', encoding='utf-8') as f:
-        all_data = json.load(f)
-    for dept in all_data.values():
-        if code_key in dept:
-            info = dept[code_key]
-            return jsonify({'code': code_key, **info}), 200
-
-    return jsonify({"error": "Course not found"}), 404
+    return jsonify({"error": f"Course \"{code_key}\" not found"}), 404
 
 # --- Profile endpoints ---
 @main.route("/update-profile", methods=["POST"])
@@ -88,10 +112,6 @@ def get_profile(email):
     if not profile:
         return jsonify({}), 200
     return jsonify(profile), 200
-
-
-
-
 
 
 # Path to the reviews JSON file
