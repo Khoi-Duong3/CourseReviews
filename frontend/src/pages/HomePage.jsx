@@ -20,9 +20,13 @@ const HomePage = () => {
 
   }, [])
 
-  if (loading) return <p className="text-center mt-8">Loading courses…</p>
-  if (error)   return <p className="text-center mt-8 text-red-500">Error: {error}</p>
-
+  if (loading) {
+    return <p className="text-center mt-8">Loading courses…</p>
+  }
+  if (error) {
+    return <p className="text-center mt-8 text-red-500">Error: {error}</p>
+  }
+  
   return (
     <>
         <Banner />

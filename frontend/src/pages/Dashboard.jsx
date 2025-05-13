@@ -4,6 +4,10 @@ import HomeCourses from '../components/HomeCourses'
 
 export default function Dashboard() {
   const [limit, setLimit] = useState(9)
+  const [courses, setCourses] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
 
   useEffect(() => {
     const onScroll = () => {
@@ -19,9 +23,29 @@ export default function Dashboard() {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  useEffect(() => {
+      fetch('api/courses')
+        .then(res => {
+          if (!res.ok) throw new Error(res.statusText)
+          return res.json()
+        })
+        .then(data => setCourses(data))
+        .catch(err => setError(err.message))
+        .finally(() => setLoading(false))
+  
+  }, [])
+
+  if (loading) {
+    return <p className="text-center mt-8">Loading courses…</p>
+  }
+  
+  if (error)   {
+    return <p className="text-center mt-8 text-red-500">Error: {error}</p>
+  }
+
   return (
     <div className="py-4">
-      <HomeCourses isHome={false} limit={limit} />
+      <HomeCourses courses={courses} isHome={false} limit={limit} />
     </div>
   )
 }
