@@ -87,33 +87,6 @@ def get_course(code):
 
     return jsonify({"error": f"Course \"{code_key}\" not found"}), 404
 
-# --- Profile endpoints ---
-@main.route("/update-profile", methods=["POST"])
-def update_info():
-    """Add or update a user's profile by email."""
-    data = request.get_json()
-    email = data.get("email")
-    mongo.db.profiles.update_one(
-        {"email": email},
-        {"$set": {
-            "firstname":    data.get("firstname"),
-            "lastname":     data.get("lastname"),
-            "major":        data.get("major"),
-            "levelofStudy":   data.get("levelOfStudy")
-        }},
-        upsert=True
-    )
-    return jsonify({"message": "Profile updated"}), 200
-
-@main.route('/profile/<email>', methods=['GET'])
-def get_profile(email):
-    """Retrieve a user's profile by email."""
-    profile = mongo.db.profiles.find_one({"email": email}, {"_id": 0})
-    if not profile:
-        return jsonify({}), 200
-    return jsonify(profile), 200
-
-
 # Path to the reviews JSON file
 REVIEWS_PATH = os.path.abspath(
     os.path.join(
@@ -192,3 +165,39 @@ def add_json_review():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+PROFILES_PATH = os.path.abspath(
+    os.path.join(
+        os.path.dirname(__file__),
+        '..',
+        'profile.json'
+    )
+)
+
+with open(PROFILES_PATH, "r", encoding="utf-8") as f:
+    PROFILES = json.load(f)
+
+def save_profiles():
+    with open(PROFILES_PATH, "w", encoding="utf-8") as f:
+        json.dump(PROFILES, f, indent=2)
+
+@main.route("/profile/<email>", methods=["POST"])
+def update_profile(email):
+    key = email.lower()
+    data = request.get_json() or {}
+
+    existing_data = PROFILES.get(key, {})
+    updated_data = { **existing_data, **data }
+    PROFILES[key] = updated_data
+    save_profiles()
+
+    return jsonify(updated_data), 200
+
+@main.route("/profile/<email>", methods=["GET"])
+def get_profile(email):
+    key = email.lower()
+    profile = PROFILES.get(key, {})
+    return jsonify(profile), 200
+
+
+
