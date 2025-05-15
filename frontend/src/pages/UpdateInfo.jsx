@@ -8,20 +8,27 @@ export default function UpdateInfoPage() {
   const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0()
   const navigate = useNavigate()
 
-  // form state
+  
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [major, setMajor] = useState('')
   const [levelOfStudy, setLevelOfStudy] = useState('')
 
   useEffect(() => {
-    if (user) {
-      setFirstName(user.firstName || '')
-      setLastName(user.lastName || '')
-      setMajor(user.major || '')
-      setLevelOfStudy(user.levelOfStudy || '')
+    if (!isAuthenticated || !user?.email) {
+      return
     }
-  }, [user])
+
+    fetch(`/api/profile/${encodeURIComponent(user.email)}`)
+    .then (result => result.json())
+    .then (profile => {
+        setFirstName   (profile.firstName   || '')
+        setLastName    (profile.lastName    || '')
+        setMajor       (profile.major       || '')
+        setLevelOfStudy(profile.levelOfStudy|| '')
+    })
+    .catch(err => console.error('Could not load profile: ', err))
+  }, [isAuthenticated, user])
 
   if (isLoading) return <p className="text-center mt-8 text-white">Loading...</p>
   if (!isAuthenticated) {
@@ -33,14 +40,23 @@ export default function UpdateInfoPage() {
     e.preventDefault()
     try {
       const token = await getAccessTokenSilently()
-      await fetch('/api/update-profile', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ firstName, lastName, major, levelOfStudy })
-      })
+      const result = await fetch(
+        `/api/profile/${encodeURIComponent(user.email)}`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ firstName, lastName, major, levelOfStudy })
+        }
+      )
+      if (!result.ok) {
+        throw new Error(result.statusText)
+      }
+      const updated = await result.json()
+      console.log('Updated profile from server:', updated)
+  
       toast.success('Profile updated successfully')
       navigate('/test')
     } catch (err) {
@@ -111,7 +127,7 @@ export default function UpdateInfoPage() {
 
             <button
               type="submit"
-              className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-bold py-2 rounded transition-colors"
+              className="w-full bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-2 rounded transition-colors"
             >
               Save Changes
             </button>
