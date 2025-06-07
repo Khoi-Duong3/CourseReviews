@@ -3,6 +3,9 @@ from flask import Flask
 from flask_cors import CORS
 from application.database import init_db
 from application.routes import main
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Initialize Flask app
 app = Flask(
@@ -12,8 +15,8 @@ app = Flask(
 )
 
 # Flask configurations
-app.config["SECRET_KEY"] = 'e9bf7bac979fba4fa3b024f34b5308d7d4e69eae'
-app.config["MONGO_URI"] = "mongodb+srv://KhoiDuong3:Kd0902089154!@cluster0.8y9j9w9.mongodb.net/E"
+app.config["SECRET_KEY"] = os.environ['SECRET_KEY']
+app.config["MONGO_URI"] = os.environ['MONGO_URI']
 
 # Initialize database
 db = init_db(app)
