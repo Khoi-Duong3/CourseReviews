@@ -13,7 +13,7 @@ app = Flask(
 
 # Flask configurations
 app.config["SECRET_KEY"] = 'e9bf7bac979fba4fa3b024f34b5308d7d4e69eae'
-app.config["MONGO_URI"] = "mongodb+srv://bs34:FaLNdAcUW7z3Kvb4@please.3yjvj.mongodb.net/reviewsHahaha?retryWrites=true&w=majority&appName=PLEASE"
+app.config["MONGO_URI"] = "mongodb+srv://KhoiDuong3:Kd0902089154!@cluster0.8y9j9w9.mongodb.net/E"
 
 # Initialize database
 db = init_db(app)
