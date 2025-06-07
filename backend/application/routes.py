@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from application.database import mongo
+from.database import mongo
 import json
 import os
 import datetime
@@ -8,196 +9,136 @@ import uuid
 main = Blueprint("main", __name__, url_prefix='/api')
 
 # Path to the static JSON (for initial development without MongoDB)
-DATA_PATH = os.path.abspath(
-    os.path.join(
-        os.path.dirname(__file__),
-        '..',
-        'mcmaster_courses_full.json'
-    )
-)
+BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+DATA_PATH = os.path.join(BASE_DIR, 'mcmaster_courses_full.json')
+REVIEWS_PATH = os.path.join(BASE_DIR, 'reviews.json')
+PROFILES_PATH = os.path.join(BASE_DIR, 'profile.json')
 
+# Loading the course data
+# Load course data
 with open(DATA_PATH, encoding="utf-8") as f:
     ALL_COURSES = json.load(f)
 
-@main.route("/reviews/<course_code>", methods=["GET"])
-def get_course_reviews(course_code):
-    code_key = course_code.strip().upper()
-    dept = code_key.split()[0]
+# Load profiles JSON (simple fallback storage)
+try:
+    with open(PROFILES_PATH, 'r', encoding='utf-8') as f:
+        PROFILES = json.load(f)
+except FileNotFoundError:
+    PROFILES = {}
 
-    # 1) Try the static reviews.json first
-    try:
-        with open(REVIEWS_PATH, "r", encoding="utf-8") as f:
-            all_reviews = json.load(f)
-        if dept in all_reviews and code_key in all_reviews[dept]:
-            return jsonify(all_reviews[dept][code_key]), 200
-    except FileNotFoundError:
-        # no reviews.json yet, keep going
-        pass
-    except Exception as e:
-        # JSON parse error? log it and keep going
-        print("Error loading reviews.json:", e)
+# Utility to save profiles
+def save_profiles():
+    with open(PROFILES_PATH, 'w', encoding='utf-8') as f:
+        json.dump(PROFILES, f, indent=2)
 
-    # 2) Fall back to Mongo
-    try:
-        db_reviews = list(
-            mongo.db.reviews
-               .find({"course_code": code_key}, {"_id": 0})
-        )
-        return jsonify(db_reviews), 200
-    except Exception:
-        # Mongo not set up / auth failed — just move on
-        pass
-
-    # 3) Nothing found → return empty array
-    return jsonify([]), 200
-
-@main.route("/reviews", methods=["POST"])
-def add_review():
-    """Add a new review to the database."""
-    data = request.get_json()
-    mongo.db.reviews.insert_one(data)
-    return jsonify({"message": "Review added successfully!"}), 201
-
-# --- Course endpoints using static JSON ---
-@main.route("/courses", methods=["GET"])
+# --- Course Endpoints ---
+@main.route('/courses', methods=['GET'])
 def list_courses():
-    """List all courses from JSON file."""
-    with open(DATA_PATH, 'r', encoding='utf-8') as f:
-        all_data = json.load(f)
-    flat = [{ 'code': code, **info }
-            for dept in all_data.values()
-            for code, info in dept.items()]
+    flat = [
+        {'code': code, **info}
+        for dept in ALL_COURSES.values()
+        for code, info in dept.items()
+    ]
     return jsonify(flat), 200
 
-@main.route("/courses/<code>", methods=["GET"])
+@main.route('/courses/<code>', methods=['GET'])
 def get_course(code):
-    code_key = code.strip().upper()
-
-    for block in ALL_COURSES.values():
-        if code_key in block:
-            info = block[code_key]
-            return jsonify({ "code": code_key, **info}), 200
-    
+    key = code.strip().upper()
+    # Try Mongo first
     try:
-        course = mongo.db.courses.find_one({"code": code_key}, {"_id": 0})
+        course = mongo.db.courses.find_one({'code': key}, {'_id': 0})
         if course:
             return jsonify(course), 200
     except Exception:
         pass
+    # Fallback to static JSON
+    for dept in ALL_COURSES.values():
+        if key in dept:
+            return jsonify({'code': key, **dept[key]}), 200
+    return jsonify({'error': f'Course "{key}" not found'}), 404
 
-    return jsonify({"error": f"Course \"{code_key}\" not found"}), 404
-
-# Path to the reviews JSON file
-REVIEWS_PATH = os.path.abspath(
-    os.path.join(
-    os.path.dirname(__file__),
-    '..',
-    'reviews.json'
-    )
-)
-
-@main.route("/json-reviews/<department>/<course_code>", methods=["GET"])
-def get_json_reviews(department, course_code):
-    """Retrieve all reviews for a specific course from JSON file."""
+# --- Review Endpoints ---
+@main.route('/reviews/<course_code>', methods=['GET'])
+def get_course_reviews(course_code):
+    key = course_code.strip().upper()
+    # Try Mongo first
+    try:
+        db_reviews = list(mongo.db.reviews.find({'course_code': key}, {'_id': 0}))
+        if db_reviews:
+            return jsonify(db_reviews), 200
+    except Exception:
+        pass
+    # JSON fallback
     try:
         with open(REVIEWS_PATH, 'r', encoding='utf-8') as f:
             reviews_data = json.load(f)
+        return jsonify(reviews_data.get(key.split()[0], {}).get(key, [])), 200
+    except Exception:
+        pass
+    return jsonify([]), 200
 
-        if department in reviews_data and course_code in reviews_data[department]:
-            return jsonify(reviews_data[department][course_code]), 200
-        else:
-            return jsonify([]), 200
-    except FileNotFoundError:
-        # If file doesn't exist yet, return empty array
-        return jsonify([]), 200
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@main.route("/json-reviews", methods=["POST"])
-def add_json_review():
-    """Add a new review to the JSON file."""
-    data = request.get_json()
-    department = data.get("department")
-    course_code = data.get("code")
-    review = data.get("review")
-
-    if not department or not course_code or not review:
-        return jsonify({"error": "Missing required fields"}), 400
-
-    try:
-        # Create reviews.json if it doesn't exist
+@main.route('/reviews', methods=['POST'])
+def add_review():
+    data = request.get_json() or {}
+    dept = data.get('department')
+    code = data.get('code')
+    review = data.get('review')
+    if dept and code and review:
+        # Save to JSON
         if not os.path.exists(REVIEWS_PATH):
             with open(REVIEWS_PATH, 'w', encoding='utf-8') as f:
                 json.dump({}, f)
-
-        # Read existing reviews
         with open(REVIEWS_PATH, 'r', encoding='utf-8') as f:
             reviews_data = json.load(f)
-
-        # Create department and course entries if they don't exist
-        if department not in reviews_data:
-            reviews_data[department] = {}
-
-        if course_code not in reviews_data[department]:
-            reviews_data[department][course_code] = []
-
-        # Add ID and timestamp to review
-        review_with_meta = {
+        reviews_data.setdefault(dept, {}).setdefault(code, [])
+        review_meta = {
             **review,
-            "id": str(uuid.uuid4()),
-            "timestamp": datetime.datetime.now().isoformat()
+            'id': str(uuid.uuid4()),
+            'timestamp': datetime.datetime.now().isoformat()
         }
-
-        # Add the review
-        reviews_data[department][course_code].append(review_with_meta)
-
-        # Write updated data back to file
+        reviews_data[dept][code].append(review_meta)
         with open(REVIEWS_PATH, 'w', encoding='utf-8') as f:
             json.dump(reviews_data, f, indent=2)
+        # also Mongo
+        try:
+            mongo.db.reviews.insert_one({'course_code': code, **review_meta})
+        except Exception:
+            pass
+        return jsonify({'review': review_meta}), 201
+    return jsonify({'error': 'Missing fields'}), 400
 
-        # Also save to MongoDB for consistency
-        mongo.db.reviews.insert_one({
-            "course_code": course_code,
-            **review_with_meta
-        })
+# --- Profile Endpoints ---
+@main.route('/profile/<email>', methods=['GET'])
+def profile_get(email):
+    key = email.lower()
+    # Try Mongo first
+    try:
+        profile = mongo.db.profiles.find_one({'email': key}, {'_id': 0})
+        if profile:
+            return jsonify(profile), 200
+    except Exception:
+        pass
+    # JSON fallback
+    return jsonify(PROFILES.get(key, {})), 200
 
-        return jsonify({"message": "Review added successfully!", "review": review_with_meta}), 201
-
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    
-PROFILES_PATH = os.path.abspath(
-    os.path.join(
-        os.path.dirname(__file__),
-        '..',
-        'profile.json'
-    )
-)
-
-with open(PROFILES_PATH, "r", encoding="utf-8") as f:
-    PROFILES = json.load(f)
-
-def save_profiles():
-    with open(PROFILES_PATH, "w", encoding="utf-8") as f:
-        json.dump(PROFILES, f, indent=2)
-
-@main.route("/profile/<email>", methods=["POST"])
-def update_profile(email):
+@main.route('/profile/<email>', methods=['POST'])
+def profile_update(email):
     key = email.lower()
     data = request.get_json() or {}
-
-    existing_data = PROFILES.get(key, {})
-    updated_data = { **existing_data, **data }
-    PROFILES[key] = updated_data
+    # Try updating Mongo first
+    try:
+        mongo.db.profiles.update_one(
+            {'email': key}, {'$set': data}, upsert=True
+        )
+        updated = mongo.db.profiles.find_one({'email': key}, {'_id': 0})
+        return jsonify(updated), 200
+    except Exception:
+        pass
+    # JSON fallback
+    existing = PROFILES.get(key, {})
+    PROFILES[key] = {**existing, **data}
     save_profiles()
-
-    return jsonify(updated_data), 200
-
-@main.route("/profile/<email>", methods=["GET"])
-def get_profile(email):
-    key = email.lower()
-    profile = PROFILES.get(key, {})
-    return jsonify(profile), 200
+    return jsonify(PROFILES[key]), 200
 
 
 
