@@ -13,6 +13,7 @@ import UpdateInfo from './pages/UpdateInfo'
 
 const domain = import.meta.env.VITE_APP_AUTH0_DOMAIN;
 const clientID = import.meta.env.VITE_APP_AUTH0_CLIENT_ID;
+const audience = import.meta.env.VITE_AUTH0_AUDIENCE;
 
 
 const router = createBrowserRouter(
@@ -26,7 +27,7 @@ const router = createBrowserRouter(
       <Route path='courseinfo' element={<CourseInfo/>}/>
       <Route path='courseinfo/:code' element={<CourseInfo/>} />
       <Route path='login' element={<LoginPage />} />
-      <Route path='test' element={<ProfilePage />} />
+      <Route path='profile' element={<ProfilePage />} />
       <Route path='dashboard' element={<Dashboard />} />
       <Route path='updateinfo' element={<UpdateInfo />} />
     </Route>
@@ -52,7 +53,7 @@ function ProfileOnLogin() {
     const [firstName] = (user.name || '').split(' ')
 
     fetch(`/api/profile/${encodeURIComponent(user.email)}`, {
-      method: "POST",
+      method: "GET",
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
         firstName,
@@ -73,6 +74,8 @@ const App = () => {
     redirectUri={window.location.origin}
     cacheLocation='localstorage'
     useRefreshTokens={true}
+    audience={audience}
+    scope="openid profile email offline_access" 
   >
     <ProfileOnLogin />
     <RouterProvider router={router} />

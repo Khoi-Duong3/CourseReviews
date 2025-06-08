@@ -9,7 +9,7 @@ const HomePage = () => {
   const [error, setError] = useState(null)
 
   useEffect(() => {
-    fetch('api/courses')
+    fetch('/api/courses')
       .then(res => {
         if (!res.ok) throw new Error(res.statusText)
         return res.json()

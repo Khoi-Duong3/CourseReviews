@@ -28,8 +28,8 @@ const NavBar = () => {
                       Home
                     </NavLink>
                     {isAuthenticated && (
-                      <NavLink to='test' className="text-white hover:bg-red-900 rounded-md px-3 py-2">
-                        Test
+                      <NavLink to='/profile' className="text-white hover:bg-red-900 rounded-md px-3 py-2">
+                        Profile
                       </NavLink>
                     )}
                     

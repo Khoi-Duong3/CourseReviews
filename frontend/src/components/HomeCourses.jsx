@@ -1,29 +1,47 @@
-import React from 'react'
-import coops from '../coops.json'
+import React, { useEffect, useState } from 'react'
 import Post from './Post';
-import coursesData from '../mcmaster_courses_full.json'
 import { NavLink } from 'react-router-dom';
-import Dashboard from '../pages/Dashboard';
 
 
-const HomeCourses = ({isHome = false, limit = Infinity}) => {
-  const allCourses = []
+const HomeCourses = ({isHome = false, limit = Infinity, courses: propCourses}) => {
+  const [allCourses, setAllCourses] = useState(propCourses || []);
+  const [loading, setLoading] = useState(propCourses ? false : true);
+  const [error, setError] = useState(null);
 
-  for (const course of Object.values(coursesData)){
-    for (const [code, info] of Object.entries(course)){
-      allCourses.push({code : code, name: info.name, description: info.description, prereq: info.prerequisites, antireq: info.antirequisites})
-    }
+  useEffect(() => {
+    if (propCourses) return
+    fetch('/api/courses')
+      .then(res => {
+        if (!res.ok) throw new Error(res.status)
+        return res.json()
+      })
+      .then(data => {
+        setAllCourses(data)
+        setLoading(false)
+      })
+      .catch(err => {
+        console.error(err)
+        setError('Failed to load courses')
+        setLoading(false)
+      })
+  }, [propCourses])
+
+  if (loading) {
+    return <p className="text-center mt-8 text-yellow-500">Loading courses…</p>
   }
-
+  if (error) {
+    return <p className="text-center mt-8 text-red-500">{error}</p>
+  }
+  
   const coursesToShow = isHome ? allCourses.slice(0,6) : allCourses.slice(0, limit);
 
   return (
-    <section class="bg-red-950 px-4 py-10">
-      <div class="container-xl lg:container m-auto">
-        <h2 class="text-3xl font-bold text-yellow-500 mb-6 text-center">
+    <section className="bg-red-950 px-4 py-10">
+      <div className="container-xl lg:container m-auto">
+        <h2 className="text-3xl font-bold text-yellow-500 mb-6 text-center">
           Highlighted Courses
         </h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           
           {coursesToShow.map((course) => (
             <Post key={course.code} course={course}/>

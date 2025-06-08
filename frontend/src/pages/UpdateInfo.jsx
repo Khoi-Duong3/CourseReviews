@@ -58,7 +58,7 @@ export default function UpdateInfoPage() {
       console.log('Updated profile from server:', updated)
   
       toast.success('Profile updated successfully')
-      navigate('/test')
+      navigate('/profile')
     } catch (err) {
       console.error(err)
       toast.error('Failed to update profile')
