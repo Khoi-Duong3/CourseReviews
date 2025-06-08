@@ -1,13 +1,36 @@
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { useAuth0 } from '@auth0/auth0-react'
 import { useNavigate } from 'react-router-dom'
 import bgimage from '../assets/images/maccampus.jpg'
 
 export default function Profile() {
-  const { user, isAuthenticated, isLoading } = useAuth0()
+  const { user, isAuthenticated, isLoading, getAccessTokenSilently } = useAuth0()
   const navigate = useNavigate()
+  const [profile, setProfile] = useState(null)
   const fileInputRef = useRef(null)
   const [preview, setPreview] = useState(user.picture || null)
+
+  useEffect(() => {
+    if (!isAuthenticated || !user?.email) return;
+  
+    (async () => {
+      try {
+        const token = await getAccessTokenSilently();
+        const res = await fetch(
+          `/api/profile/${encodeURIComponent(user.email)}`,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+        if (!res.ok) throw new Error(res.statusText);
+        const data = await res.json();
+        setProfile(data);
+        if (data.picture) setPreview(data.picture);
+      } catch (err) {
+        console.error('Failed to load profile:', err);
+      }
+    })();
+  }, [isAuthenticated, user, getAccessTokenSilently]);
 
   if (isLoading) return <p className="text-center mt-8 text-yellow-500">Loading...</p>
 
@@ -43,11 +66,11 @@ export default function Profile() {
             <div className="flex flex-col md:flex-row items-center md:justify-start md:space-x-2">
               
               <div className="flex-1 space-y-4">
-                <p><strong>First Name:</strong> {user.name || 'None'}</p>
-                <p><strong>Last Name:</strong> {user.lastName || 'None'}</p>
-                <p><strong>Email:</strong> {user.email || 'None'}</p>
-                <p><strong>Major:</strong> {user.major || 'None'}</p>
-                <p><strong>Level of Study:</strong> {user.levelOfStudy || 'None'}</p>
+                <p><strong>First Name:</strong> {profile.firstName || 'None'}</p>
+                <p><strong>Last Name:</strong> {profile.lastName || 'None'}</p>
+                <p><strong>Email:</strong> {profile.email || 'None'}</p>
+                <p><strong>Major:</strong> {profile.major || 'None'}</p>
+                <p><strong>Level of Study:</strong> {profile.levelOfStudy || 'None'}</p>
               </div>
 
               

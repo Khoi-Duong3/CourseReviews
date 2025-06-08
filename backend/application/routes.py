@@ -109,17 +109,28 @@ def add_review():
 
 # --- Profile Endpoints ---
 @main.route('/profile/<email>', methods=['GET'])
-def profile_get(email):
+def get_profile(email):
     key = email.lower()
-    # Try Mongo first
-    try:
-        profile = mongo.db.profiles.find_one({'email': key}, {'_id': 0})
-        if profile:
-            return jsonify(profile), 200
-    except Exception:
-        pass
-    # JSON fallback
-    return jsonify(PROFILES.get(key, {})), 200
+
+    # 1) Try to load the existing profile
+    profile = mongo.db.profiles.find_one(
+        {'email': key},
+        {'_id': 0}      
+    )
+
+    # 2) If it doesn’t exist yet, create it (first-login only)
+    if profile is None:
+        profile = {
+            'email':        key,
+            'firstName':    '',
+            'lastName':     '',
+            'major':        '',
+            'levelOfStudy': ''
+        }
+        mongo.db.profiles.insert_one(profile)
+
+    # 3) Return the profile (new or existing)
+    return jsonify(profile), 200
 
 @main.route('/profile/<email>', methods=['POST'])
 def profile_update(email):

@@ -25,4 +25,4 @@ db = init_db(app)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Register API routes
-app.register_blueprint(main)
+app.register_blueprint(main,  url_prefix="/api")
