@@ -180,10 +180,14 @@ const Review = ({
 
   // Both display and write modes
   return (
-      <div className="space-y-8">
-        <ReviewForm onSubmit={handleSubmitReview} />
-        {text && <ReviewDisplay text={text} difficulty={difficulty} value={value} overall={overall} />}
+    <section className='bg-red-950 px-4 py-10'>
+      <div className='container-xl lg:container m-auto'>
+        <div className="space-y-8">
+          <ReviewForm onSubmit={handleSubmitReview} />
+          {text && <ReviewDisplay text={text} difficulty={difficulty} value={value} overall={overall} />}
+        </div>
       </div>
+    </section>
   )
 }
 

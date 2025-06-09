@@ -1,19 +1,19 @@
 import { useAuth0 } from '@auth0/auth0-react'
 import React, { useState, useEffect } from 'react'
 
-const ReviewForm = () => {
+const ReviewForm = ({ onSubmitReview }) => {
     const [text,       setText]       = useState('')
     const [difficulty, setDifficulty] = useState("")
     const [value,      setValue]      = useState("")
     const [overall,    setOverall]    = useState("")
-    
+
     const handleSubmit = e => {
     e.preventDefault()
     onSubmitReview({
       text,
       difficulty: parseInt(difficulty, 10),
       value:      parseInt(value, 10),
-      overall:    parseInt(overall, 10)
+      overall:    parseInt(overall, 10),
     })
     // clear form for next time
     setText('')

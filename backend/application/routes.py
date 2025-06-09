@@ -3,7 +3,7 @@ from application.database import mongo
 from.database import mongo
 import json
 import os
-import datetime
+from datetime import datetime
 import uuid
 
 main = Blueprint("main", __name__, url_prefix='/api')
@@ -63,7 +63,7 @@ def get_course_reviews(course_code):
     key = course_code.strip().upper()
     # Try Mongo first
     try:
-        db_reviews = list(mongo.db.reviews.find({'course_code': key}, {'_id': 0}))
+        db_reviews = list(mongo.db.reviews.find({'code': key}, {'_id': 0}))
         if db_reviews:
             return jsonify(db_reviews), 200
     except Exception:
@@ -79,33 +79,35 @@ def get_course_reviews(course_code):
 
 @main.route('/reviews', methods=['POST'])
 def add_review():
-    data = request.get_json() or {}
-    dept = data.get('department')
-    code = data.get('code')
-    review = data.get('review')
-    if dept and code and review:
-        # Save to JSON
-        if not os.path.exists(REVIEWS_PATH):
-            with open(REVIEWS_PATH, 'w', encoding='utf-8') as f:
-                json.dump({}, f)
-        with open(REVIEWS_PATH, 'r', encoding='utf-8') as f:
-            reviews_data = json.load(f)
-        reviews_data.setdefault(dept, {}).setdefault(code, [])
-        review_meta = {
+    data = request.get_json()
+    email = data['email']
+    review = {
+        'text': data['text'],
+        'difficulty': data['difficulty'],
+        'value': data['value'],
+        'overall': data['overall'],
+        'firstName': data['firstName'],
+        'lastName': data['lastName'],
+        'createdAt': data.get('createdAt', datetime.utcnow().isoformat())
+    }
+
+    mongo.db.reviews.insert_one({
+        'email': email,
+        'code': data['code'],
+        **review
+    })
+
+    mongo.db.profiles.update_one(
+        {'email': email},
+        {'$push': {'reviews': {
             **review,
-            'id': str(uuid.uuid4()),
-            'timestamp': datetime.datetime.now().isoformat()
-        }
-        reviews_data[dept][code].append(review_meta)
-        with open(REVIEWS_PATH, 'w', encoding='utf-8') as f:
-            json.dump(reviews_data, f, indent=2)
-        # also Mongo
-        try:
-            mongo.db.reviews.insert_one({'course_code': code, **review_meta})
-        except Exception:
-            pass
-        return jsonify({'review': review_meta}), 201
-    return jsonify({'error': 'Missing fields'}), 400
+            'code': data['code']
+        }}},
+        upsert = False
+    )
+
+    return jsonify({'review': review}), 201
+    
 
 # --- Profile Endpoints ---
 @main.route('/profile/<email>', methods=['GET'])
