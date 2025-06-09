@@ -22,6 +22,17 @@ export default function CourseInfo() {
 
   const [showReviewForm, setShowReviewForm] = useState(false)
 
+  // Profile state
+  const [profile, setProfile] = useState(null)
+
+  useEffect(() => {
+    if (!isAuthenticated) return
+    fetch(`/api/profile/${encodeURIComponent(user.email)}`)
+      .then(r => r.json())
+      .then(setProfile)
+      .catch(console.error)
+  }, [isAuthenticated, user])
+
   // Fetch course details
   useEffect(() => {
     async function fetchCourse() {
@@ -67,10 +78,36 @@ export default function CourseInfo() {
     if (key) fetchReviews()
   }, [key])
 
+  const handleSubmitReview = async ({text, difficulty, value, overall}) => {
+    if (!profile) return
+    const data = {
+      email: profile.email,
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+      code,
+      text,
+      difficulty,
+      value,
+      overall,
+      createdAt: new Date().toISOString()
+    }
+    const result = await fetch('/api/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json'},
+      body: JSON.stringify(data)
+    })
+    const { review } = await result.json()
+    setReviews(r => [...r, review])
+    setShowReviewForm(false)
+  }
+
+
+
   // Loading spinner
   if (courseLoading) return <p className="text-center mt-8">Loading course...</p>
   // API or lookup errors
   if (courseError)   return <p className="text-center mt-8 text-red-500">{courseError}</p>
+  if (reviewsError)   return <p className="text-center mt-8 text-red-500">{reviewsError}</p>
   // Only show "not found" once loading is done and there's no course
   if (!course && !courseLoading) return <p className="text-center mt-8 text-red-500">Course not found</p>
 
@@ -99,21 +136,7 @@ export default function CourseInfo() {
               </button>
             </div>
             {showReviewForm && (
-              <ReviewForm 
-                code = {key}
-                onSubmitReview={newReview => {
-                  fetch('/api/reviews', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json'},
-                    body: JSON.stringify({code: key, review: newReview}),
-                  })
-                  .then( result => result.json())
-                  .then(data => {
-                    if (data.review) setReviews(prev => [...prev, data.review])
-                  })
-                .catch(error => console.error(error))
-                }}
-              />
+              <ReviewForm onSubmitReview = {handleSubmitReview}/>
             )} 
           </>
         )}
