@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import CourseDetailCard from '../components/CourseDetailCard'
 import Review from '../components/Review'
+import { useAuth0 } from '@auth0/auth0-react';
+import ReviewForm from '../components/ReviewForm';
 
 export default function CourseInfo() {
   const { code = '' } = useParams()
   const key = decodeURIComponent(code).trim().toUpperCase()
+  const { loginWithRedirect, logout, isAuthenticated, user } = useAuth0(); 
 
   // Course state
   const [course, setCourse] = useState(null)
@@ -18,10 +21,6 @@ export default function CourseInfo() {
   const [reviewsError, setReviewsError] = useState(null)
 
   const [showReviewForm, setShowReviewForm] = useState(false)
-  const [reviewText, setReviewText] = useState('')
-  const [difficulty, setDifficulty] = useState(3)
-  const [value, setValue] = useState(3)
-  const [overall, setOverall] = useState(3)
 
   // Fetch course details
   useEffect(() => {
@@ -68,35 +67,6 @@ export default function CourseInfo() {
     if (key) fetchReviews()
   }, [key])
 
-  // Handle submit new review
-  const handleSubmitReview = (e) => {
-    e.preventDefault()
-
-    const newReview = {
-      text: reviewText,
-      difficulty: parseInt(difficulty, 10),
-      value: parseInt(value, 10),
-      overall: parseInt(overall, 10)
-    }
-
-    fetch('/api/reviews', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ code: key, review: newReview }),
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.review) setReviews(prev => [...prev, data.review])
-      })
-      .catch(err => console.error('Error submitting review:', err))
-
-    setReviewText('')
-    setDifficulty(3)
-    setValue(3)
-    setOverall(3)
-    setShowReviewForm(false)
-  }
-
   // Loading spinner
   if (courseLoading) return <p className="text-center mt-8">Loading course...</p>
   // API or lookup errors
@@ -117,29 +87,37 @@ export default function CourseInfo() {
       </div>
 
       <main className="max-w-4xl mx-auto py-8 space-y-8">
-        <div className="text-center">
-          <h3 className="text-2xl font-bold mb-4">Reviews</h3>
-          <button
-            onClick={() => setShowReviewForm(!showReviewForm)}
-            className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mb-6"
-          >
-            {showReviewForm ? 'Cancel' : 'Add Review'}
-          </button>
-        </div>
-
-        {showReviewForm && (
-          <form onSubmit={handleSubmitReview} className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h4 className="text-xl font-semibold mb-4">Write a Review</h4>
-            {/* form fields here */}
-            <button
-              type="submit"
-              className="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded"
-            >
-              Submit Review
-            </button>
-          </form>
+        {isAuthenticated && (
+          <>
+            <div className="text-center">
+              <h3 className="text-2xl font-bold mb-4">Reviews</h3>
+              <button
+                onClick={() => setShowReviewForm(!showReviewForm)}
+                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mb-6"
+              >
+                {showReviewForm ? 'Cancel' : 'Add Review'}
+              </button>
+            </div>
+            {showReviewForm && (
+              <ReviewForm 
+                code = {key}
+                onSubmitReview={newReview => {
+                  fetch('/api/reviews', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json'},
+                    body: JSON.stringify({code: key, review: newReview}),
+                  })
+                  .then( result => result.json())
+                  .then(data => {
+                    if (data.review) setReviews(prev => [...prev, data.review])
+                  })
+                .catch(error => console.error(error))
+                }}
+              />
+            )} 
+          </>
         )}
-
+        
         {reviewsLoading ? (
           <p className="text-center">Loading reviews...</p>
         ) : reviews.length > 0 ? (
