@@ -11,14 +11,14 @@ export default function CourseInfo() {
   const { isAuthenticated, user } = useAuth0()
 
   // Course state
-  const [course, setCourse]                 = useState(null)
-  const [courseLoading, setCourseLoading]   = useState(true)
-  const [courseError, setCourseError]       = useState(null)
+  const [course, setCourse] = useState(null)
+  const [courseLoading, setCourseLoading] = useState(true)
+  const [courseError, setCourseError] = useState(null)
 
   // Reviews state
-  const [reviews, setReviews]               = useState([])
+  const [reviews, setReviews] = useState([])
   const [reviewsLoading, setReviewsLoading] = useState(true)
-  const [reviewsError, setReviewsError]     = useState(null)
+  const [reviewsError, setReviewsError] = useState(null)
 
   // Control form visibility
   const [showReviewForm, setShowReviewForm] = useState(false)

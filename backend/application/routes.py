@@ -77,6 +77,12 @@ def get_course_reviews(course_code):
         pass
     return jsonify([]), 200
 
+@main.route('/reviews/users/<email>', methods=['GET'])
+def get_profile_reviews(email):
+    key = email.lower()
+    reviews = list(mongo.db.reviews.find({'email': key}, {'_id': 0}))
+    return jsonify(reviews)
+
 @main.route('/reviews', methods=['POST'])
 def add_review():
     data = request.get_json()
