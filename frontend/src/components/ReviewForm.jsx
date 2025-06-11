@@ -2,10 +2,11 @@ import { useAuth0 } from '@auth0/auth0-react'
 import React, { useState, useEffect } from 'react'
 
 const ReviewForm = ({ onSubmitReview }) => {
-    const [text,       setText]       = useState('')
+    const [text, setText] = useState('')
     const [difficulty, setDifficulty] = useState("")
-    const [value,      setValue]      = useState("")
-    const [overall,    setOverall]    = useState("")
+    const [value, setValue] = useState("")
+    const [overall, setOverall] = useState("")
+    const [grade, setGrade] = useState("")
 
     const handleSubmit = e => {
     e.preventDefault()
@@ -14,12 +15,14 @@ const ReviewForm = ({ onSubmitReview }) => {
       difficulty: parseInt(difficulty, 10),
       value:      parseInt(value, 10),
       overall:    parseInt(overall, 10),
+      grade: grade
     })
     // clear form for next time
     setText('')
     setDifficulty("")
     setValue("")
     setOverall("")
+    setGrade("")
   }
 
   return (
@@ -40,7 +43,7 @@ const ReviewForm = ({ onSubmitReview }) => {
             <select
                 value = {difficulty}
                 onChange={e => setDifficulty(e.target.value)}
-                className='"block w-full border rounded p-2'
+                className='block w-full border rounded p-2'
                 required
             >
                 <option value="">Select...</option>
@@ -57,7 +60,7 @@ const ReviewForm = ({ onSubmitReview }) => {
             <select
                 value = {value}
                 onChange={e => setValue(e.target.value)}
-                className='"block w-full border rounded p-2'
+                className='block w-full border rounded p-2'
                 required
             >
                 <option value="">Select...</option>
@@ -74,7 +77,7 @@ const ReviewForm = ({ onSubmitReview }) => {
             <select
                 value = {overall}
                 onChange={e => setOverall(e.target.value)}
-                className='"block w-full border rounded p-2'
+                className='block w-full border rounded p-2'
                 required
             >
                 <option value="">Select...</option>
@@ -83,6 +86,31 @@ const ReviewForm = ({ onSubmitReview }) => {
                 <option value="3">(3) Average</option>
                 <option value="4">(4) Good</option>
                 <option value="5">(5) Excellent</option>
+            </select>
+        </label>
+
+        <label className='flex-1'>
+            <span className="block mb-1 font-medium">Grade Achieved</span>
+            <select
+                value = {grade}
+                onChange={e => setGrade(e.target.value)}
+                className='block w-full border rounded p-2'
+                required
+            >
+                <option value="">Select...</option>
+                <option value="A+">A+</option>
+                <option value="A">A</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B">B</option>
+                <option value="B-">B-</option>
+                <option value="C+">C+</option>
+                <option value="C">C</option>
+                <option value="C-">C-</option>
+                <option value="D+">D+</option>
+                <option value="D">D</option>
+                <option value="D-">D-</option>
+                <option value="F">F</option>
             </select>
         </label>
 

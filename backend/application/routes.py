@@ -86,6 +86,7 @@ def add_review():
         'difficulty': data['difficulty'],
         'value': data['value'],
         'overall': data['overall'],
+        'grade': data['grade'],
         'firstName': data['firstName'],
         'lastName': data['lastName'],
         'createdAt': data.get('createdAt', datetime.utcnow().isoformat())

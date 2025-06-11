@@ -15,7 +15,7 @@ export default function CourseDetailCard({ code, name, description, prereq, anti
         {/* Subtitle with horizontal lines */}
         <div className="flex items-center justify-center mt-2 mb-6 space-x-4">
           <hr className="border-t border-yellow-500 w-16" />
-          <span className="text-xl font-extrabold text-yellow-500">
+          <span className="text-2xl font-bold text-yellow-500">
             Details
           </span>
           <hr className="border-t border-yellow-500 w-16" />
