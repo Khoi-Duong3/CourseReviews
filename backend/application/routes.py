@@ -1,10 +1,8 @@
 from flask import Blueprint, request, jsonify
 from application.database import mongo
-from.database import mongo
 import json
 import os
 from datetime import datetime
-import uuid
 
 main = Blueprint("main", __name__, url_prefix='/api')
 
@@ -14,7 +12,7 @@ DATA_PATH = os.path.join(BASE_DIR, 'mcmaster_courses_full.json')
 REVIEWS_PATH = os.path.join(BASE_DIR, 'reviews.json')
 PROFILES_PATH = os.path.join(BASE_DIR, 'profile.json')
 
-# Loading the course data
+
 # Load course data
 with open(DATA_PATH, encoding="utf-8") as f:
     ALL_COURSES = json.load(f)
