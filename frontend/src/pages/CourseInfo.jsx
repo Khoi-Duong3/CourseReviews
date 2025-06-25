@@ -125,7 +125,7 @@ export default function CourseInfo() {
       </div>
 
       {/* Reviews section with a full-width red background and sticky bottom fill */}
-      <section className="bg-red-950 py-10 px-4 pb-60">
+      <section className="bg-red-950 py-10 px-4 pb-80">
         <div className="container-xl lg:container m-auto space-y-8">
           {isAuthenticated && (
             <>
