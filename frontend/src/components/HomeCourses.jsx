@@ -8,9 +8,11 @@ const HomeCourses = ({isHome = false, limit = Infinity, courses: propCourses}) =
   const [loading, setLoading] = useState(propCourses ? false : true);
   const [error, setError] = useState(null);
 
+  const API_BASE = import.meta.env.VITE_API_BASE || ""
+
   useEffect(() => {
     if (propCourses) return
-    fetch('/api/courses')
+    fetch(`${API_BASE}/api/courses`)
       .then(res => {
         if (!res.ok) throw new Error(res.status)
         return res.json()

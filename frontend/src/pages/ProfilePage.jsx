@@ -16,10 +16,11 @@ export default function Profile() {
   const [reviewsError, setReviewsError] = useState(null)
 
   const emailKey = isAuthenticated && user?.email ? encodeURIComponent(user.email) : null;
+  const API_BASE = import.meta.env.VITE_API_BASE || ""
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetch(`/api/profile/${encodeURIComponent(user.email)}`)
+      fetch(`${API_BASE}/api/profile/${encodeURIComponent(user.email)}`)
         .then(r => r.ok ? r.json() : Promise.reject(r.status))
         .then(data => {
           setProfile(data)
@@ -42,7 +43,7 @@ export default function Profile() {
         setReviewsLoading(true)
         setReviewsError(null)
         try {
-          const res = await fetch(`/api/reviews/users/${emailKey}`)
+          const res = await fetch(`${API_BASE}/api/reviews/users/${emailKey}`)
           if (!res.ok) throw new Error(res.statusText)
           const data = await res.json()
           setReviews(data)

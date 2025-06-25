@@ -26,10 +26,12 @@ export default function CourseInfo() {
   // Profile state
   const [profile, setProfile] = useState(null)
 
+  const API_BASE = import.meta.env.VITE_API_BASE || ""
+
   // Fetch user profile on login
   useEffect(() => {
     if (!isAuthenticated) return
-    fetch(`/api/profile/${encodeURIComponent(user.email)}`)
+    fetch(`${API_BASE}/api/profile/${encodeURIComponent(user.email)}`)
       .then(r => r.json())
       .then(setProfile)
       .catch(console.error)
@@ -41,7 +43,7 @@ export default function CourseInfo() {
       setCourseLoading(true)
       setCourseError(null)
       try {
-        const res = await fetch(`/api/courses/${encodeURIComponent(key)}`)
+        const res = await fetch(`${API_BASE}/api/courses/${encodeURIComponent(key)}`)
         if (res.status === 404) throw new Error(`The course "${key}" does not exist`)
         if (!res.ok)          throw new Error(res.statusText)
         const data = await res.json()
@@ -62,7 +64,7 @@ export default function CourseInfo() {
     async function fetchReviews() {
       setReviewsLoading(true)
       try {
-        const res = await fetch(`/api/reviews/${encodeURIComponent(key)}`)
+        const res = await fetch(`${API_BASE}/api/reviews/${encodeURIComponent(key)}`)
         if (!res.ok) throw new Error(res.statusText)
         const data = await res.json()
         setReviews(data)
@@ -92,7 +94,7 @@ export default function CourseInfo() {
       createdAt: new Date().toISOString()
     }
     try {
-      const res = await fetch('/api/reviews', {
+      const res = await fetch(`${API_BASE}/api/reviews`, {
         method:  'POST',
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(payload)
