@@ -10,14 +10,15 @@ export default function Profile() {
   const fileInputRef = useRef(null)
   const [preview, setPreview] = useState(user.picture || null)
 
+  const API_BASE = import.meta.env.VITE_API_BASE || ""
+
   useEffect(() => {
     if (!isAuthenticated || !user?.email) return;
   
     (async () => {
       try {
         const token = await getAccessTokenSilently();
-        const res = await fetch(
-          `/api/profile/${encodeURIComponent(user.email)}`,
+        const res = await fetch(`${API_BASE}/api/profile/${encodeURIComponent(user.email)}`,
           {
             headers: { Authorization: `Bearer ${token}` }
           }

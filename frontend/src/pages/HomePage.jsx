@@ -7,9 +7,10 @@ const HomePage = () => {
   const [courses, setCourses] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const API_BASE = import.meta.env.VITE_API_BASE || ""
 
   useEffect(() => {
-    fetch('/api/courses')
+    fetch(`${API_BASE}/api/courses`)
       .then(res => {
         if (!res.ok) throw new Error(res.statusText)
         return res.json()
