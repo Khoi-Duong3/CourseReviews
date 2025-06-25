@@ -21,3 +21,7 @@ node_modules
 *.sln
 *.sw?
 
+# dotenv environment files
+.env
+.env.*
+
