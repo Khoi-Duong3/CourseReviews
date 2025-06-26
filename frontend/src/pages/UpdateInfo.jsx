@@ -13,13 +13,14 @@ export default function UpdateInfoPage() {
   const [lastName, setLastName] = useState('')
   const [major, setMajor] = useState('')
   const [levelOfStudy, setLevelOfStudy] = useState('')
+  const API_BASE = import.meta.env.VITE_API_BASE || ""
 
   useEffect(() => {
     if (!isAuthenticated || !user?.email) {
       return
     }
 
-    fetch(`/api/profile/${encodeURIComponent(user.email)}`)
+    fetch(`${API_BASE}/api/profile/${encodeURIComponent(user.email)}`)
     .then (result => result.json())
     .then (profile => {
         setFirstName   (profile.firstName   || '')
@@ -41,7 +42,7 @@ export default function UpdateInfoPage() {
     try {
       const token = await getAccessTokenSilently()
       const result = await fetch(
-        `/api/profile/${encodeURIComponent(user.email)}`,
+        `${API_BASE}/api/profile/${encodeURIComponent(user.email)}`,
         {
           method: 'POST',
           headers: {
